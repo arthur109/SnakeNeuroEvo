@@ -27,6 +27,7 @@ class Snake {
             y: 0
         }
         this.ate = false
+        this.alive = true
     }
     move() {
         this.nextBlock = {
@@ -75,6 +76,18 @@ class Snake {
             this.ate = true
         }
     }
+    checkCollision() {
+        for (var i = 0; i < this.snakeBody.length; i++) {
+            for (var j = 0; j < this.snakeBody.length; j++) {
+                if (i != j && this.snakeBody[i].x === this.snakeBody[j].x && this.snakeBody[i].y === this.snakeBody[j].y) {
+                    this.alive = false
+                }
+            }
+        }
+        if (this.snakeBody[0].x >= boardSize.x || this.snakeBody[0].x < 0 || this.snakeBody[0].y >= boardSize.y || this.snakeBody[0].y < 0) {
+            this.alive = false
+        }
+    }
     display(posX, posY, tileSize) {
         noStroke();
         fill(255, 160 + 30, 15 + 30)
@@ -94,6 +107,19 @@ class Snake {
         }
         for (var x = 0; x < this.boardSize.x + 1; x++) {
             line(posX + x * tileSize, posY, posX + x * tileSize, posY + this.boardSize.y * tileSize)
+        }
+        if (this.alive === false) {
+            fill(255, 0, 0, 100)
+            rect(posX, posY, tileSize * boardSize.x, tileSize * boardSize.y)
+        }
+    }
+    run(posX, posY, tileSize) {
+        this.display(posX, posY, tileSize)
+        if (this.alive) {
+            this.controll()
+            this.move()
+            this.checkCollision(posX, posY, tileSize)
+            this.appleCheck()
         }
     }
 }
