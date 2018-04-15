@@ -41,6 +41,44 @@ class Snake {
             this.ate = false
         }
     }
+    checkOutOfBounds(x, y) {
+        if (x >= boardSize.x || x < 0 || y >= boardSize.y || y < 0) {
+            return true
+        }
+        return false
+    }
+    createArray(length) {
+        var arr = new Array(length || 0),
+            i = length;
+
+        if (arguments.length > 1) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            while (i--) arr[length - 1 - i] = createArray.apply(this, args);
+        }
+
+        return arr;
+    }
+    generateMapAndCollisions() {
+        var tempWM = this.createArray([this.boardSize.y, this.boardSize.x])
+        console.log(tempWM)
+        tempWM[this.applePos.y][this.applePos.x] = 2
+        for (var i = 0; i < this.snakeBody.length; i++) {
+            var block = {
+                x: this.snakeBody[i].x,
+                y: this.snakeBody[i].y
+            }
+            // if (this.checkOutOfBounds(block.y, block.x)) {
+            //     console.log("out")
+            //     this.alive = false
+            // } else if (tempWM[block.y][block.x] === 1) {
+            //     console.log("hit")
+            //     this.alive = false
+            // } else {
+            tempWM[block.y][block.x] = 1
+            // }
+        }
+        //console.table(tempWM)
+    }
     controll() {
         if (keyCode === UP_ARROW) {
             this.direction = {
@@ -84,13 +122,13 @@ class Snake {
                 }
             }
         }
-        if (this.snakeBody[0].x >= boardSize.x || this.snakeBody[0].x < 0 || this.snakeBody[0].y >= boardSize.y || this.snakeBody[0].y < 0) {
+        if (this.checkOutOfBounds(this.snakeBody[0].x, this.snakeBody[0].y)) {
             this.alive = false
         }
     }
     display(posX, posY, tileSize) {
         noStroke();
-        fill(255, 160 + 30, 15 + 30)
+        fill(255, 190, 45)
         rect(posX, posY, tileSize * boardSize.x, tileSize * boardSize.y)
         //Draws apple
         fill(0, 255, 0)
@@ -116,9 +154,10 @@ class Snake {
     run(posX, posY, tileSize) {
         this.display(posX, posY, tileSize)
         if (this.alive) {
+            this.generateMapAndCollisions()
+            this.checkCollision()
             this.controll()
             this.move()
-            this.checkCollision(posX, posY, tileSize)
             this.appleCheck()
         }
     }
