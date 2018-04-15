@@ -5,7 +5,7 @@ var boardSize = {
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4)
-  frameRate(1)
+  frameRate(10)
   bob = new Snake(boardSize.x, boardSize.y)
 
 }

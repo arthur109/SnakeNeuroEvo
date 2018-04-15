@@ -28,6 +28,9 @@ class Snake {
         }
         this.ate = false
         this.alive = true
+        this.globalGrid = [
+            []
+        ]
     }
     move() {
         this.nextBlock = {
@@ -47,37 +50,26 @@ class Snake {
         }
         return false
     }
-    createArray(length) {
-        var arr = new Array(length || 0),
-            i = length;
 
-        if (arguments.length > 1) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            while (i--) arr[length - 1 - i] = createArray.apply(this, args);
-        }
-
-        return arr;
-    }
     generateMapAndCollisions() {
-        var tempWM = this.createArray([this.boardSize.y, this.boardSize.x])
-        console.log(tempWM)
+        var tempWM = Array2D.build(this.boardSize.x, this.boardSize.y)
         tempWM[this.applePos.y][this.applePos.x] = 2
         for (var i = 0; i < this.snakeBody.length; i++) {
             var block = {
                 x: this.snakeBody[i].x,
                 y: this.snakeBody[i].y
             }
-            // if (this.checkOutOfBounds(block.y, block.x)) {
-            //     console.log("out")
-            //     this.alive = false
-            // } else if (tempWM[block.y][block.x] === 1) {
-            //     console.log("hit")
-            //     this.alive = false
-            // } else {
-            tempWM[block.y][block.x] = 1
-            // }
+            if (this.checkOutOfBounds(block.x, block.y)) {
+                console.log("out")
+                this.alive = false
+            } else if (tempWM[block.y][block.x] === 1) {
+                console.log("hit")
+                this.alive = false
+            } else {
+                tempWM[block.y][block.x] = 1
+            }
         }
-        //console.table(tempWM)
+        this.globalGrid = Array2D.clone(tempWM)
     }
     controll() {
         if (keyCode === UP_ARROW) {
@@ -114,18 +106,7 @@ class Snake {
             this.ate = true
         }
     }
-    checkCollision() {
-        for (var i = 0; i < this.snakeBody.length; i++) {
-            for (var j = 0; j < this.snakeBody.length; j++) {
-                if (i != j && this.snakeBody[i].x === this.snakeBody[j].x && this.snakeBody[i].y === this.snakeBody[j].y) {
-                    this.alive = false
-                }
-            }
-        }
-        if (this.checkOutOfBounds(this.snakeBody[0].x, this.snakeBody[0].y)) {
-            this.alive = false
-        }
-    }
+
     display(posX, posY, tileSize) {
         noStroke();
         fill(255, 190, 45)
@@ -133,11 +114,6 @@ class Snake {
         //Draws apple
         fill(0, 255, 0)
         rect(posX + tileSize * this.applePos.x, posY + tileSize * this.applePos.y, tileSize, tileSize)
-        //Draws snake
-        fill(23, 236, 236)
-        for (var i = 0; i < this.snakeBody.length; i++) {
-            rect(posX + tileSize * this.snakeBody[i].x, posY + tileSize * this.snakeBody[i].y, tileSize, tileSize)
-        }
         // Draws Grid
         stroke(255);
         for (var y = 0; y < this.boardSize.y + 1; y++) {
@@ -146,16 +122,22 @@ class Snake {
         for (var x = 0; x < this.boardSize.x + 1; x++) {
             line(posX + x * tileSize, posY, posX + x * tileSize, posY + this.boardSize.y * tileSize)
         }
+
+        //Draws snake
+        noStroke();
+        fill(23, 236, 236)
+        for (var i = 0; i < this.snakeBody.length; i++) {
+            rect(posX + tileSize * this.snakeBody[i].x, posY + tileSize * this.snakeBody[i].y, tileSize + 1, tileSize + 1)
+        }
         if (this.alive === false) {
             fill(255, 0, 0, 100)
-            rect(posX, posY, tileSize * boardSize.x, tileSize * boardSize.y)
+            rect(posX + 1, posY + 1, tileSize * boardSize.x - 1, tileSize * boardSize.y - 1)
         }
     }
     run(posX, posY, tileSize) {
         this.display(posX, posY, tileSize)
         if (this.alive) {
             this.generateMapAndCollisions()
-            this.checkCollision()
             this.controll()
             this.move()
             this.appleCheck()
