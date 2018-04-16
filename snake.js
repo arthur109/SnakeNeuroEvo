@@ -11,15 +11,6 @@ class Snake {
         this.snakeBody = [{
             x: 4,
             y: 4
-        }, {
-            x: 4,
-            y: 5
-        }, {
-            x: 4,
-            y: 6
-        }, {
-            x: 4,
-            y: 7
         }]
 
         this.direction = {
@@ -31,6 +22,40 @@ class Snake {
         this.globalGrid = [
             []
         ]
+        this.vision = {
+            up: {
+                x: 0,
+                y: 0
+            },
+            upRight: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            downRight: {
+                x: 0,
+                y: 0
+            },
+            down: {
+                x: 0,
+                y: 0
+            },
+            downLeft: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            },
+            upleft: {
+                x: 0,
+                y: 0
+            }
+        }
     }
     move() {
         this.nextBlock = {
@@ -43,6 +68,70 @@ class Snake {
         } else {
             this.ate = false
         }
+    }
+    ray(pos, dir) {
+        for (var i = 1; i < Math.hypot(this.boardSize.x, this.boardSize.y) + 1; i++) {
+            fill(100, 30)
+            rect(10 + (pos.x + (dir.x * i)) * 20, 10 + (pos.y + (dir.y * i)) * 20, 20, 20)
+            if (this.checkOutOfBounds(pos.x + (dir.x * i), pos.y + (dir.y * i))) {
+                return {
+                    type: "wall",
+                    dist: i
+                }
+            }
+            var tileValue = this.globalGrid[pos.y + (dir.y * i)][pos.x + (dir.x * i)]
+            if (tileValue === 1) {
+                return {
+                    type: "snake",
+                    dist: i
+                }
+            } else if (tileValue === 2) {
+                return {
+                    type: "apple",
+                    dist: i
+                }
+            }
+
+        }
+    }
+
+    see() {
+        var pos = {
+            x: this.snakeBody[0].x,
+            y: this.snakeBody[0].y
+        }
+        this.vision.up = this.ray(pos, {
+            x: 0,
+            y: -1
+        })
+        this.vision.upRight = this.ray(pos, {
+            x: 1,
+            y: -1
+        })
+        this.vision.right = this.ray(pos, {
+            x: 1,
+            y: 0
+        })
+        this.vision.downRight = this.ray(pos, {
+            x: 1,
+            y: 1
+        })
+        this.vision.down = this.ray(pos, {
+            x: 0,
+            y: 1
+        })
+        this.vision.downLeft = this.ray(pos, {
+            x: -1,
+            y: 1
+        })
+        this.vision.left = this.ray(pos, {
+            x: -1,
+            y: 0
+        })
+        this.vision.upleft = this.ray(pos, {
+            x: -1,
+            y: -1
+        })
     }
     checkOutOfBounds(x, y) {
         if (x >= boardSize.x || x < 0 || y >= boardSize.y || y < 0) {
@@ -136,8 +225,10 @@ class Snake {
     }
     run(posX, posY, tileSize) {
         this.display(posX, posY, tileSize)
+
         if (this.alive) {
             this.generateMapAndCollisions()
+            this.see()
             this.controll()
             this.move()
             this.appleCheck()

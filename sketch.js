@@ -1,5 +1,5 @@
 var boardSize = {
-  x: 20,
+  x: 35,
   y: 30
 }
 
