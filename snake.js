@@ -11,6 +11,12 @@ class Snake {
         this.snakeBody = [{
             x: 4,
             y: 4
+        }, {
+            x: 4,
+            y: 3
+        }, {
+            x: 4,
+            y: 2
         }]
 
         this.direction = {
@@ -56,6 +62,7 @@ class Snake {
                 y: 0
             }
         }
+        this.brain = new NeuralNetwork(16, 10, 4)
     }
     move() {
         this.nextBlock = {
@@ -69,25 +76,46 @@ class Snake {
             this.ate = false
         }
     }
+    indexOfMax(arr) {
+        if (arr.length === 0) {
+            return -1;
+        }
+
+        var max = arr[0];
+        var maxIndex = 0;
+
+        for (var i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                maxIndex = i;
+                max = arr[i];
+            }
+        }
+
+        return maxIndex;
+    }
+
     ray(pos, dir) {
         for (var i = 1; i < Math.hypot(this.boardSize.x, this.boardSize.y) + 1; i++) {
-            fill(100, 30)
-            rect(10 + (pos.x + (dir.x * i)) * 20, 10 + (pos.y + (dir.y * i)) * 20, 20, 20)
+            // fill(100, 30)
+            // rect(10 + (pos.x + (dir.x * i)) * 20, 10 + (pos.y + (dir.y * i)) * 20, 20, 20)
             if (this.checkOutOfBounds(pos.x + (dir.x * i), pos.y + (dir.y * i))) {
                 return {
-                    type: "wall",
+                    //wall
+                    type: 3,
                     dist: i
                 }
             }
             var tileValue = this.globalGrid[pos.y + (dir.y * i)][pos.x + (dir.x * i)]
             if (tileValue === 1) {
                 return {
-                    type: "snake",
+                    //snake
+                    type: "2",
                     dist: i
                 }
             } else if (tileValue === 2) {
                 return {
-                    type: "apple",
+                    //apple
+                    type: "1",
                     dist: i
                 }
             }
@@ -133,6 +161,7 @@ class Snake {
             y: -1
         })
     }
+
     checkOutOfBounds(x, y) {
         if (x >= boardSize.x || x < 0 || y >= boardSize.y || y < 0) {
             return true
@@ -160,7 +189,7 @@ class Snake {
         }
         this.globalGrid = Array2D.clone(tempWM)
     }
-    controll() {
+    HUMANcontroll() {
         if (keyCode === UP_ARROW) {
             this.direction = {
                 x: 0,
@@ -186,6 +215,45 @@ class Snake {
             }
         }
     }
+    AIcontroll() {
+        var input = [this.vision.up.dist, this.vision.up.type,
+            this.vision.upRight.dist, this.vision.upRight.type,
+            this.vision.right.dist, this.vision.right.type,
+            this.vision.downRight.dist, this.vision.downRight.type,
+            this.vision.down.dist, this.vision.down.type,
+            this.vision.downLeft.dist, this.vision.downLeft.type,
+            this.vision.left.dist, this.vision.left.type,
+            this.vision.upleft.dist, this.vision.upleft.type
+        ]
+
+        var rawFutureMove = this.brain.predict(input)
+        var chosenMove = this.indexOfMax(rawFutureMove)
+
+        if (chosenMove === 0) {
+            this.direction = {
+                x: 0,
+                y: -1
+            }
+        }
+        if (chosenMove === 1) {
+            this.direction = {
+                x: 0,
+                y: 1
+            }
+        }
+        if (chosenMove === 2) {
+            this.direction = {
+                x: 1,
+                y: 0
+            }
+        }
+        if (chosenMove === 3) {
+            this.direction = {
+                x: -1,
+                y: 0
+            }
+        }
+    }
     appleCheck() {
         if (this.applePos.x == this.snakeBody[0].x && this.applePos.y == this.snakeBody[0].y) {
             this.applePos = {
@@ -197,7 +265,7 @@ class Snake {
     }
 
     display(posX, posY, tileSize) {
-        noStroke();
+        stroke(0)
         fill(255, 190, 45)
         rect(posX, posY, tileSize * boardSize.x, tileSize * boardSize.y)
         //Draws apple
@@ -205,10 +273,10 @@ class Snake {
         rect(posX + tileSize * this.applePos.x, posY + tileSize * this.applePos.y, tileSize, tileSize)
         // Draws Grid
         stroke(255);
-        for (var y = 0; y < this.boardSize.y + 1; y++) {
+        for (var y = 1; y < this.boardSize.y; y++) {
             line(posX, posY + y * tileSize, posX + tileSize * boardSize.x, posY + y * tileSize)
         }
-        for (var x = 0; x < this.boardSize.x + 1; x++) {
+        for (var x = 1; x < this.boardSize.x; x++) {
             line(posX + x * tileSize, posY, posX + x * tileSize, posY + this.boardSize.y * tileSize)
         }
 
@@ -229,7 +297,7 @@ class Snake {
         if (this.alive) {
             this.generateMapAndCollisions()
             this.see()
-            this.controll()
+            this.AIcontroll()
             this.move()
             this.appleCheck()
         }
