@@ -108,13 +108,13 @@ class Snake {
             if (tileValue === 1) {
                 return {
                     //snake
-                    type: "2",
+                    type: 2,
                     dist: i
                 }
             } else if (tileValue === 2) {
                 return {
                     //apple
-                    type: "1",
+                    type: 1,
                     dist: i
                 }
             }
@@ -215,15 +215,18 @@ class Snake {
         }
     }
     AIcontroll() {
-        var input = [this.vision.up.dist, this.vision.up.type,
-            this.vision.upRight.dist, this.vision.upRight.type,
-            this.vision.right.dist, this.vision.right.type,
-            this.vision.downRight.dist, this.vision.downRight.type,
-            this.vision.down.dist, this.vision.down.type,
-            this.vision.downLeft.dist, this.vision.downLeft.type,
-            this.vision.left.dist, this.vision.left.type,
-            this.vision.upleft.dist, this.vision.upleft.type
-        ]
+        var input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        var visionArray = Object.values(this.vision)
+        console.table(visionArray)
+        // var input = [this.vision.up.dist, this.vision.up.type,
+        //     this.vision.upRight.dist, this.vision.upRight.type,
+        //     this.vision.right.dist, this.vision.right.type,
+        //     this.vision.downRight.dist, this.vision.downRight.type,
+        //     this.vision.down.dist, this.vision.down.type,
+        //     this.vision.downLeft.dist, this.vision.downLeft.type,
+        //     this.vision.left.dist, this.vision.left.type,
+        //     this.vision.upleft.dist, this.vision.upleft.type
+        // ]
 
         var rawFutureMove = this.brain.predict(input)
         var chosenMove = this.indexOfMax(rawFutureMove)

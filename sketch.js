@@ -1,6 +1,6 @@
 var boardSize = {
-  x: 15,
-  y: 15
+  x: 16,
+  y: 16
 }
 var tileSize = 10;
 var genSize = 2000
