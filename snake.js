@@ -1,5 +1,5 @@
 class Snake {
-    constructor(XboardSize, YboardSize, identity) {
+    constructor(XboardSize, YboardSize) {
         this.boardSize = {
             x: XboardSize,
             y: YboardSize
@@ -64,7 +64,9 @@ class Snake {
         }
         this.brain = new NeuralNetwork(16, 10, 4)
         this.score = 0;
-        this.id = identity;
+        this.applePrise = 25;
+        this.stallLimit = 100;
+        this.stallCount = 0;
     }
     move() {
         this.nextBlock = {
@@ -180,10 +182,10 @@ class Snake {
                 y: this.snakeBody[i].y
             }
             if (this.checkOutOfBounds(block.x, block.y)) {
-                console.log("out")
+                //console.log("out")
                 this.alive = false
             } else if (tempWM[block.y][block.x] === 1) {
-                console.log("hit")
+                //console.log("hit")
                 this.alive = false
             } else {
                 tempWM[block.y][block.x] = 1
@@ -263,7 +265,8 @@ class Snake {
                 y: Math.floor(Math.random() * boardSize.y)
             }
             this.ate = true
-            this.score += 100
+            this.score += this.applePrise
+            this.stallCount = 0;
         }
     }
 
@@ -294,9 +297,7 @@ class Snake {
             rect(posX + 1, posY + 1, tileSize * boardSize.x - 1, tileSize * boardSize.y - 1)
         }
     }
-    run(posX, posY, tileSize) {
-        this.display(posX, posY, tileSize)
-
+    run() {
         if (this.alive) {
             this.generateMapAndCollisions()
             this.see()
@@ -304,6 +305,10 @@ class Snake {
             this.move()
             this.appleCheck()
             this.score += 1;
+            this.stallCount += 1
+            if (this.stallCount > this.stallLimit) {
+                this.alive = false
+            }
         }
     }
 }
