@@ -9,14 +9,8 @@ class Snake {
             y: Math.floor(Math.random() * boardSize.y)
         }
         this.snakeBody = [{
-            x: 4,
-            y: 4
-        }, {
-            x: 4,
-            y: 3
-        }, {
-            x: 4,
-            y: 2
+            x: 7,
+            y: 7
         }]
 
         this.direction = {
@@ -67,6 +61,7 @@ class Snake {
         this.applePrise = 25;
         this.stallLimit = 100;
         this.stallCount = 0;
+        this.TimeReward = false;
     }
     move() {
         this.nextBlock = {
@@ -304,7 +299,9 @@ class Snake {
             this.AIcontroll()
             this.move()
             this.appleCheck()
-            this.score += 1;
+            if (this.TimeReward) {
+                this.score += 1;
+            }
             this.stallCount += 1
             if (this.stallCount > this.stallLimit) {
                 this.alive = false
