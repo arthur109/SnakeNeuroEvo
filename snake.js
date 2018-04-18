@@ -61,7 +61,7 @@ class Snake {
         this.applePrise = 25;
         this.stallLimit = 100;
         this.stallCount = 0;
-        this.TimeReward = false;
+        this.TimeReward = true;
     }
     move() {
         this.nextBlock = {
