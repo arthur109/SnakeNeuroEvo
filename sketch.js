@@ -69,7 +69,7 @@ function createNewGen(fittestImportance) {
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4)
-  //frameRate()
+  //frameRate(1)
   createStartGen()
 }
 

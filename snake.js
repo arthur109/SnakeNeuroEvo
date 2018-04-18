@@ -56,7 +56,7 @@ class Snake {
                 y: 0
             }
         }
-        this.brain = new NeuralNetwork(16, 10, 4)
+        this.brain = new NeuralNetwork(24, 14, 4)
         this.score = 0;
         this.applePrise = 25;
         this.stallLimit = 100;
@@ -100,7 +100,7 @@ class Snake {
             if (this.checkOutOfBounds(pos.x + (dir.x * i), pos.y + (dir.y * i))) {
                 return {
                     //wall
-                    type: 3,
+                    type: 2,
                     dist: i
                 }
             }
@@ -108,13 +108,13 @@ class Snake {
             if (tileValue === 1) {
                 return {
                     //snake
-                    type: 2,
+                    type: 1,
                     dist: i
                 }
             } else if (tileValue === 2) {
                 return {
                     //apple
-                    type: 1,
+                    type: 0,
                     dist: i
                 }
             }
@@ -216,8 +216,6 @@ class Snake {
     }
     AIcontroll() {
         var input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        var visionArray = Object.values(this.vision)
-        console.table(visionArray)
         // var input = [this.vision.up.dist, this.vision.up.type,
         //     this.vision.upRight.dist, this.vision.upRight.type,
         //     this.vision.right.dist, this.vision.right.type,
@@ -227,7 +225,22 @@ class Snake {
         //     this.vision.left.dist, this.vision.left.type,
         //     this.vision.upleft.dist, this.vision.upleft.type
         // ]
+        var visionArray = Object.values(this.vision)
+        // for (var i = 0; i < input.length; i++) {
+        //     if (((i + 1) % visionArray[Math.floor(i / 3)].type) === 0) {
+        //         input[i] = visionArray[Math.floor(i / 3)].dist
+        //     } else {
+        //         //input[i] = i * 1000 + visionArray[Math.floor(i / 3)].type
+        //     }
+        // }
+        //console.log(visionArray)
+        for (var i = 0; i < visionArray.length; i++) {
+            //console.log((i * 3) + visionArray[i].type, visionArray[i].dist)
+            input[(i * 3) + visionArray[i].type] = visionArray[i].dist
+        }
 
+
+        //console.table(input)
         var rawFutureMove = this.brain.predict(input)
         var chosenMove = this.indexOfMax(rawFutureMove)
 
