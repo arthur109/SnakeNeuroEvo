@@ -1,5 +1,5 @@
 class Snake {
-    constructor(XboardSize, YboardSize) {
+    constructor(XboardSize, YboardSize, identity) {
         this.boardSize = {
             x: XboardSize,
             y: YboardSize
@@ -63,6 +63,8 @@ class Snake {
             }
         }
         this.brain = new NeuralNetwork(16, 10, 4)
+        this.score = 0;
+        this.id = identity;
     }
     move() {
         this.nextBlock = {
@@ -261,6 +263,7 @@ class Snake {
                 y: Math.floor(Math.random() * boardSize.y)
             }
             this.ate = true
+            this.score += 100
         }
     }
 
@@ -300,6 +303,7 @@ class Snake {
             this.AIcontroll()
             this.move()
             this.appleCheck()
+            this.score += 1;
         }
     }
 }
